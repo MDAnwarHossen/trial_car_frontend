@@ -318,13 +318,5 @@ dialog::backdrop {
   margin: 0;
 }
 
-details.specs { margin-top: .5rem; }
-details.specs summary { cursor: pointer; list-style: none; }
-details.specs .specs-content { padding: 1rem; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.15); background: var(--card-bg); margin-top: .5rem; }
-
-
-
-
-
 
 
