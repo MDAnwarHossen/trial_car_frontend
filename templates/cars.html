@@ -1,0 +1,25 @@
+<h1>Cars</h1>
+
+{{if .cars}}
+<ul class="car-list">
+  {{range .cars}}
+  <li class="car-list-item">
+    <div class="car-card">
+      <div class="car-image">
+        <img src="/api/img/{{.Image}}" alt="{{.Name}}" />
+      </div>
+
+      <div class="car-body">
+        <div class="car-header">
+          <h2 class="car-title">{{.Name}}</h2>
+          <span class="car-year">{{.Year}}</span>
+        </div>
+        <p class="car-hint">Click to view full technical specs →</p>
+      </div>
+    </div>
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p>No cars available.</p>
+{{end}}

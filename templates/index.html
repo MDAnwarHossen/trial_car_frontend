@@ -1,0 +1,42 @@
+{{if .cars}}
+<ul class="car-list">
+  {{range $i, $car := .cars}}
+  <li class="car-list-item">
+    <div class="car-card">
+      <div class="car-image">
+        <img src="/api/img/{{$car.Image}}" alt="{{$car.Name}}" />
+      </div>
+
+      <div class="car-body">
+        <div class="car-header">
+          <h2 class="car-title">{{$car.Name}}</h2>
+          <span class="car-year">{{$car.Year}}</span>
+        </div>
+        <p class="car-hint">Click to view full technical specs →</p>
+
+        <dialog id="modal-{{$i}}" class="rounded">
+          <h1>{{$car.Name}} — Specs</h1>
+          <p>Put full specs here...</p>
+          <button
+            type="button"
+            onclick="document.getElementById('modal-{{$i}}').close()"
+          >
+            Close
+          </button>
+        </dialog>
+
+        <button
+          type="button"
+          onclick="(function(){const d=document.getElementById('modal-{{$i}}'); if(d && d.showModal) d.showModal(); else if(d && d.show) d.show(); else alert('Modal not supported.'); })()"
+          class="btn btn-primary"
+        >
+          Show Modal
+        </button>
+      </div>
+    </div>
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p>No cars available.</p>
+{{end}}

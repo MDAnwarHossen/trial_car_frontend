@@ -1,0 +1,11 @@
+<h1>Products</h1>
+
+{{if .Products}}
+<ul>
+  {{range .Products}}
+  <li class="product"><strong>{{.Name}}</strong> — €{{.Price}}</li>
+  {{end}}
+</ul>
+{{else}}
+<p>No products available.</p>
+{{end}}
