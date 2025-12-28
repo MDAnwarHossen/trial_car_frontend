@@ -14,24 +14,15 @@
         </div>
         <p class="car-hint">Click to view full technical specs →</p>
 
-        <dialog id="modal-{{$i}}" class="rounded">
-          <h1>{{$car.Name}} — Specs</h1>
-          <p>Put full specs here...</p>
-          <button
-            type="button"
-            onclick="document.getElementById('modal-{{$i}}').close()"
-          >
-            Close
-          </button>
-        </dialog>
+        <details class="specs">
+          <summary class="btn btn-primary">Show Specs</summary>
 
-        <button
-          type="button"
-          onclick="(function(){const d=document.getElementById('modal-{{$i}}'); if(d && d.showModal) d.showModal(); else if(d && d.show) d.show(); else alert('Modal not supported.'); })()"
-          class="btn btn-primary"
-        >
-          Show Modal
-        </button>
+          <div class="specs-content">
+            <h3>{{$car.Name}} — Specs</h3>
+            <p>Put full specs here...</p>
+            <!-- Add extra actions if needed -->
+          </div>
+        </details>
       </div>
     </div>
   </li>
