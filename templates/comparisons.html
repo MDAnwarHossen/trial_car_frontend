@@ -1,0 +1,44 @@
+<h1 class="title">Car Comparison</h1>
+
+{{ if not .Models }}
+<p>No cars selected for comparison.</p>
+{{ else }}
+<div class="comparison-table-wrapper">
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Car Name</th>
+        <th>Year</th>
+        <th>Engine</th>
+        <th>Horsepower</th>
+        <th>Transmission</th>
+        <th>Drivetrain</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{range .Models}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Year}}</td>
+        <td>{{.Specifications.Engine}}</td>
+        <td>{{.Specifications.Horsepower}}</td>
+        <td>{{.Specifications.Transmission}}</td>
+        <td>{{.Specifications.Drivetrain}}</td>
+        <td>
+          <form
+            method="post"
+            action="/comparisons/remove"
+            style="display: inline"
+          >
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <button type="submit" class="btn">Remove</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{ end }}

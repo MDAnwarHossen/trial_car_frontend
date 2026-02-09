@@ -1,42 +1,165 @@
-{{if .cars}}
-<ul class="car-list">
-  {{range $i, $car := .cars}}
-  <li class="car-list-item">
-    <div class="car-card">
-      <div class="car-image">
-        <img src="/api/img/{{$car.Image}}" alt="{{$car.Name}}" />
-      </div>
-
-      <div class="car-body">
-        <div class="car-header">
-          <h2 class="car-title">{{$car.Name}}</h2>
-          <span class="car-year">{{$car.Year}}</span>
-        </div>
-        <p class="car-hint">Click to view full technical specs →</p>
-
-        <dialog id="modal-{{$i}}" class="rounded">
-          <h1>{{$car.Name}} — Specs</h1>
-          <p>Put full specs here...</p>
-          <button
-            type="button"
-            onclick="document.getElementById('modal-{{$i}}').close()"
-          >
-            Close
-          </button>
-        </dialog>
-
-        <button
-          type="button"
-          onclick="(function(){const d=document.getElementById('modal-{{$i}}'); if(d && d.showModal) d.showModal(); else if(d && d.show) d.show(); else alert('Modal not supported.'); })()"
-          class="btn btn-primary"
-        >
-          Show Modal
-        </button>
-      </div>
+<!-- ================= Reusable template ================= -->
+{{ define "car-card" }}
+<li class="car-list-item">
+  <div class="car-card">
+    <div class="car-image">
+      <img src="/api/img/{{ .Car.Image }}" alt="{{ .Car.Name }}" />
     </div>
-  </li>
-  {{end}}
-</ul>
-{{else}}
+
+    <div class="car-body">
+      <div class="car-header">
+        <h2 class="car-title">{{ .Car.Name }}</h2>
+        <span class="car-year">{{ .Car.Year }}</span>
+      </div>
+
+      <p class="car-hint">Click to view full technical specs →</p>
+
+      <!-- Modal -->
+      <dialog
+        id="modal-{{ .Prefix }}-{{ .Index }}"
+        class="modal rounded"
+        aria-labelledby="modal-title-{{ .Prefix }}-{{ .Index }}"
+      >
+        <div class="modal-content">
+          <div class="modal-left">
+            <img
+              class="modal-image"
+              src="/api/img/{{ .Car.Image }}"
+              alt="{{ .Car.Name }}"
+            />
+            <div class="modal-actions-left">
+              <button
+                type="button"
+                onclick="document.getElementById('modal-{{ .Prefix }}-{{ .Index }}').close()"
+                class="btn"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-right">
+            <h2 id="modal-title-{{ .Prefix }}-{{ .Index }}">
+              {{ .Car.Name }} — Specifications
+            </h2>
+            <ul>
+              <li><strong>Engine:</strong> {{ .Car.Specifications.Engine }}</li>
+              <li>
+                <strong>Horsepower:</strong> {{ .Car.Specifications.Horsepower
+                }}
+              </li>
+              <li>
+                <strong>Transmission:</strong> {{
+                .Car.Specifications.Transmission }}
+              </li>
+              <li>
+                <strong>Drivetrain:</strong> {{ .Car.Specifications.Drivetrain
+                }}
+              </li>
+            </ul>
+
+            <div
+              class="modal-actions-right"
+              style="display: flex; gap: 0.5rem; align-items: center"
+            >
+              {{ $fav := index .FavoriteSet .Car.ID }}
+              <form
+                method="post"
+                action="/favorite/toggle"
+                class="favorite-fallback"
+              >
+                <input type="hidden" name="id" value="{{ .Car.ID }}" />
+                {{ if $fav }}
+                <button
+                  type="submit"
+                  class="btn favorite-btn"
+                  data-id="{{ .Car.ID }}"
+                >
+                  ❤️
+                </button>
+                {{ else }}
+                <button
+                  type="submit"
+                  class="btn favorite-btn"
+                  data-id="{{ .Car.ID }}"
+                >
+                  🤍
+                </button>
+                {{ end }}
+              </form>
+
+              <form method="post" action="/action">
+                <input type="hidden" name="compare" value="{{ .Car.ID }}" />
+                <button type="submit" class="btn btn-primary">
+                  Add to Comparisons
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </dialog>
+
+      <button
+        type="button"
+        onclick="document.getElementById('modal-{{ .Prefix }}-{{ .Index }}').showModal()"
+        class="btn btn-primary"
+      >
+        Show Specs
+      </button>
+    </div>
+  </div>
+</li>
+{{ end }}
+<!-- ================= Filter ================= -->
+<form method="get" action="/" class="filters" style="margin-bottom: 1.5rem">
+  <label>
+    Manufacturer:
+    <select name="manufacturer">
+      <option value="">All manufacturers</option>
+      {{range .Manufacturers}}
+      <option value="{{.ID}}">{{.Name}}</option>
+      {{end}}
+    </select>
+  </label>
+
+  <label style="margin-left: 1rem">
+    Category:
+    <select name="category">
+      <option value="">All categories</option>
+      {{range .Categories}}
+      <option value="{{.ID}}">{{.Name}}</option>
+      {{end}}
+    </select>
+  </label>
+
+  <button type="submit" class="btn btn-primary" style="margin-left: 1rem">
+    Filter
+  </button>
+
+  <a href="/" class="btn" style="margin-left: 0.5rem"> Reset </a>
+</form>
+
+<!-- ================= Recommended Car List ================= -->
+{{ if .Recommendations }}
+<section class="recommendations">
+  <h2>Recommended for you</h2>
+  <ul class="car-list">
+    {{ range $i, $car := .Recommendations }} {{ template "car-card" (dict "Car"
+    $car "Index" $i "Prefix" "rec" "FavoriteSet" $.FavoriteSet) }} {{ end }}
+  </ul>
+  <h2>More to love</h2>
+</section>
+{{ end }}
+<!-- ================= Car List ================= -->
+
+{{ if .cars }}
+<section class="all-cars">
+  <ul class="car-list">
+    {{ range $i, $car := .cars }} {{ template "car-card" (dict "Car" $car
+    "Index" $i "Prefix" "main" "FavoriteSet" $.FavoriteSet) }} {{ end }}
+  </ul>
+</section>
+
+{{ else }}
 <p>No cars available.</p>
-{{end}}
+{{ end }}

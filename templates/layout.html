@@ -7,23 +7,64 @@
   <body>
     <nav class="nav-row">
       <div class="nav-inner">
-        <h1>CAR<span class="brand-blue">VAULT</span></h1>
+        <a class="logo" href="/"
+          ><h1>CAR<span class="brand-blue">VAULT</span></h1></a
+        >
         <div class="controls">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search models..."
-            class="search-input"
-          />
-          <button onclick="showCompare()" class="btn btn-primary">
-            Compare
-          </button>
+          <a href="/comparisons" class="btn btn-primary">Show comparisons</a>
         </div>
       </div>
     </nav>
-
-    <h1>Hello world</h1>
     {{embed}}
-    <h1>Hellow world</h1>
+    <script>
+      document.addEventListener("click", function (e) {
+        // only handle clicks on favorite buttons
+        const btn = e.target.closest && e.target.closest(".favorite-btn");
+        if (!btn) return;
+
+        // prevent the form submit / navigation
+        e.preventDefault();
+
+        const id = btn.getAttribute("data-id");
+        if (!id) return;
+
+        // optimistic UI: toggle heart immediately so UI feels snappy
+        const current = btn.textContent.trim();
+        const wasAdded = current === "❤️";
+        btn.textContent = wasAdded ? "🤍" : "❤️";
+
+        // Send the POST using form-encoded body
+        const body = new URLSearchParams();
+        body.append("id", id);
+
+        fetch("/favorite/toggle", {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body.toString(),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error("Network response not ok");
+            return response.json();
+          })
+          .then((data) => {
+            // server returns { added: true/false, id: <id> }
+            if (!("added" in data)) {
+              // unexpected response — revert UI
+              btn.textContent = wasAdded ? "❤️" : "🤍";
+              return;
+            }
+            // reflect server truth
+            btn.textContent = data.added ? "❤️" : "🤍";
+          })
+          .catch((err) => {
+            // revert on error and optionally log
+            console.error("favorite toggle failed", err);
+            btn.textContent = wasAdded ? "❤️" : "🤍";
+          });
+      });
+    </script>
   </body>
 </html>
